@@ -40,7 +40,7 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         contentchat = f.read()
     if str(chatid) not in contentchat:
         with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n\n")
+            f.write(f"{chatid}\n")
 
     keyboard = [
         [InlineKeyboardButton("⚙ Group manage",callback_data="manage")],
@@ -1371,6 +1371,23 @@ async def surprise(update,context):
     
 # ============ pickup line =============
 async def flirt(update, context):
+
+    user_id = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(user_id) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{user_id}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        contentchat = f.read()
+    if str(chatid) not in contentchat:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+
     pickup_lines = [
         "kya tum Wi-Fi ho? Kyuki tumse connect hote hi sab smooth lagta hai.",
         "kya tum Google ho? Jo dhoondta hu sab tumme mil jata hai.",
@@ -1493,10 +1510,21 @@ async def flirt(update, context):
         "Tumhari baat karte karte time ka pata nahi chalta.",
         "Tumhari simplicity hi tumhari best quality hai."
     ]
-    a = random.choice(pickup_lines)
-    b = context.args[0]
-    await update.message.reply_text(f"{b} {a}")
+    b = random.choice(pickup_lines)
+    if update.message.reply_to_message:
+        user = update.message.reply_to_message.from_user
 
+        await update.message.reply_text(f" {user.first_name} {b}")
+
+
+    elif len(context.args)>0:
+        a = context.args[0]
+        await update.message.reply_text(f"{a}c {b}")
+
+    else:
+        await update.message.reply_text(
+            "reply to a useru"
+        )
 
 
 #tables 
@@ -1771,6 +1799,21 @@ async def say(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ============= fuck ================
 
 async def fuck(update, context):
+
+    user_id = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(user_id) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{user_id}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        contentchat = f.read()
+    if str(chatid) not in contentchat:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
     
     things = [
         "a spoon",
@@ -1894,6 +1937,20 @@ async def fuck(update, context):
 
 # ==============roast -==================
 async def roast(update, context):
+    user_id = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(user_id) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{user_id}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        contentchat = f.read()
+    if str(chatid) not in contentchat:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
     roasts = [
         "itna slow hai ki loading screen bhi isse aage nikal jati hai.",
         "iske dimaag ka password shayad ye khud bhi bhool chuka hai.",
@@ -2064,6 +2121,22 @@ async def roast(update, context):
 
 # ============= arrest =================
 async def arrest(update, context):
+
+    user_id = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(user_id) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{user_id}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        contentchat = f.read()
+    if str(chatid) not in contentchat:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
     reasons = [
     "had se zyada bakchodi karne ke liye",
     "class me padhai ki acting karne ke liye",
@@ -2146,7 +2219,7 @@ async def arrest(update, context):
     "dimaag ka istemaal na karne ke liye",
     "insaaniyat ke khilaaf bakchodi karne ke liye",
     "single hone ke liye",
-    
+
 ]
 
     b = random.choice(reasons)
