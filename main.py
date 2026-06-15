@@ -49,6 +49,7 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🗒 save notes",callback_data="save")],
         [InlineKeyboardButton("🟰 calculator",callback_data="calculator")],
         [InlineKeyboardButton("🗣 say something",callback_data="say")],
+        [InlineKeyboardButton("🥰roast and fuck",callback_data="roast")],
         [InlineKeyboardButton("🦍other commands",callback_data="other")],
         [InlineKeyboardButton("💘give feedback",callback_data="feed")],
     ]
@@ -195,6 +196,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
          await query.message.reply_text(
              "/say <text> ---- to say smtng\n" \
              "/say100 <text> ---- to say smtng in loop"
+         )
+    elif query.data == "roast":
+         await query.message.reply_text(
+            "/roast <name> (or reply to a user)\n"
+            "/fuck <name> (or reply to a user)"
          )
 
 
@@ -1366,6 +1372,56 @@ async def surprise(update,context):
 # ============ pickup line =============
 async def flirt(update, context):
     pickup_lines = [
+        "kya tum Wi-Fi ho? Kyuki tumse connect hote hi sab smooth lagta hai.",
+        "kya tum Google ho? Jo dhoondta hu sab tumme mil jata hai.",
+        "tum calculator ho kya? Kyuki tum meri problems solve kar deti ho.",
+        "tumhari smile ka subscription kaha se milta hai?",
+        "kya tum magician ho? Tumhe dekhte hi sab gayab ho jata hai.",
+        "tum coffee ho kya? Kyuki tumhare bina din start nahi hota.",
+        "kya tum charger ho? Kyuki tum mujhe energy de deti ho.",
+        "tumhari aankhon me GPS hai kya? Main kho sa jata hu.",
+        "kya tum exam ho? Kyuki tumhara hi khayal rehta hai.",
+        "tum weather ho kya? Kyuki tum mood change kar deti ho.",
+        "kya tum keyboard ho? Kyuki tum meri type ho.",
+        "tum star ho kya? Kyuki tumhari taraf hi dekhta rehta hu.",
+        "kya tum light ho? Kyuki tum room brighten kar deti ho.",
+        "tum song ho kya? Kyuki repeat pe chalti rehti ho.",
+        "kya tum library ho? Kyuki tum interesting lagti ho.",
+        "tumhari smile illegal honi chahiye, dil chura leti hai.",
+        "kya tum moon ho? Kyuki sabse alag chamakti ho.",
+        "tumhari wajah se battery bhi full feel hoti hai.",
+        "kya tum shortcut ho? Kyuki tum dil tak jaldi pahunch gayi.",
+        "tum meri favourite notification ho.",
+        "kya tum pizza ho? Kyuki tumhe mana karna impossible hai.",
+        "tumhari aankhon me pura Netflix chal raha hai.",
+        "kya tum bookmark ho? Kyuki tum yaad reh jaati ho.",
+        "tum bina filter ke bhi perfect lagti ho.",
+        "kya tum playlist ho? Kyuki mood set kar deti ho.",
+        "tum meri lucky charm lagti ho.",
+        "kya tum sunlight ho? Kyuki din bana deti ho.",
+        "tumse baat karke lagta hai internet fast ho gaya.",
+        "kya tum dream ho? Kyuki sach hone jaisi lagti ho.",
+        "tumhara naam Google Maps me hona chahiye, destination mil gaya.",
+        "kya tum chocolate ho? Kyuki mood instantly better ho jata hai.",
+        "tum emoji ho kya? Kyuki har baat pe smile aa jati hai.",
+        "kya tum Bluetooth ho? Dil automatically connect ho jata hai.",
+        "tumhare saath time fast forward ho jata hai.",
+        "kya tum screenshot ho? Kyuki tumhe save karne ka mann karta hai.",
+        "tum favourite chapter jaisi lagti ho.",
+        "kya tum rainbow ho? Kyuki din colourful bana deti ho.",
+        "tumhari awaaz notification sound se bhi better hai.",
+        "kya tum AI ho? Kyuki mind read kar leti ho.",
+        "tumhare saath awkward silence bhi achha lagta hai.",
+        "kya tum cloud ho? Kyuki saare thoughts tumpe store hain.",
+        "tum meri search history se bhi zyada yaad aati ho.",
+        "kya tum OTP ho? Kyuki tumhare bina login nahi hota.",
+        "tumhari smile lag hoti hai, dil pe directly hit karti hai.",
+        "kya tum meme ho? Kyuki baar baar dekhne ka mann karta hai.",
+        "tum meri favourite distraction ho.",
+        "kya tum update ho? Kyuki life better kar deti ho.",
+        "tumse milke lagta hai luck finally online aa gaya.",
+        "kya tum homepage ho? Kyuki sab tumse start hota hai.",
+        "tumhara reply din ka best part hota hai."
         "Pata nahi tum special ho ya meri nazar, par tum par aake ruk jaati hai.",    
         "Main usually kisi ko message karne ka reason dhoondta hu, tum exception lagti ho.",    
         "Tumse baat karke lagta hai din thoda better ho gaya.",    
@@ -1712,7 +1768,402 @@ async def say(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(mess)
 
+# ============= fuck ================
 
+async def fuck(update, context):
+    
+    things = [
+        "a spoon",
+        "a door handle",
+        "a wet sock",
+        "a plastic chair",
+        "a TV remote",
+        "a half-eaten samosa",
+        "a ceiling fan",
+        "a toothpaste tube",
+        "a rusty bucket",
+        "a school notebook",
+        "a broken charger",
+        "a bathroom slipper",
+        "a kitchen sponge",
+        "a water bottle cap",
+        "a curtain rod",
+        "a keyboard key",
+        "a pencil sharpener",
+        "a traffic cone",
+        "a dustbin lid",
+        "a lunch box",
+        "a cracked mirror",
+        "a potato peeler",
+        "a clothes hanger",
+        "a shower curtain",
+        "a doorbell",
+        "a light switch",
+        "a pillow cover",
+        "a toilet brush",
+        "a frying pan",
+        "a garden hose",
+        "a calculator cover",
+        "a table leg",
+        "a packet of Maggi",
+        "a mosquito racket",
+        "a bicycle seat",
+        "a steel plate",
+        "a rolling pin",
+        "a broken umbrella",
+        "a packet of ketchup",
+        "a refrigerator magnet",
+        "a shampoo bottle",
+        "a window frame",
+        "a mouse pad",
+        "a wooden ruler",
+        "a stapler",
+        "a roll of toilet paper",
+        "a doormat",
+        "a cricket stump",
+        "a brick-shaped eraser",
+        "a suspiciously large cucumber",
+        "a missed call from mom",
+        "a low attendance warning",
+        "a failed CAPTCHA",
+        "a buffering YouTube video",
+        "an expired coupon",
+        "a dead power bank",
+        "a broken zipper",
+        "a forgotten password",
+        "a laggy Zoom meeting",
+        "a scratched CD",
+        "a corrupted save file",
+        "a leaking water bottle",
+        "a noisy ceiling fan",
+        "a stuck Windows update",
+        "a group project",
+        "an unpaid internship",
+        "a badly cropped screenshot",
+        "a cracked phone screen",
+        "a weak Wi-Fi signal",
+        "a never-ending loading bar",
+        "a 404 error page",
+        "a surprise test",
+        "a Monday morning",
+        "an alarm clock at 5 AM",
+        "a rejected friend request",
+        "a broken headphone jack",
+        "a forgotten charger",
+        "a wrong exam center",
+        "a printer with no ink",
+        "a locked PDF",
+        "a badly timed power cut",
+        "a slow elevator",
+        "a spinning wheel of death",
+        "a 1-star review",
+        "a fake giveaway",
+        "a scam call",
+        "a crying toddler",
+        "a mosquito at 3 AM",
+        "a stubborn ketchup bottle",
+        "a squeaky door",
+        "a shopping cart with one bad wheel",
+        "a packet of stale chips",
+        "a broken selfie stick",
+        "a talking parrot",
+        "a haunted teddy bear",
+        "a suspicious pigeon",
+        "a forgotten assignment",
+        "a random Lego brick",
+        "a cricket ball through the window",
+        "a chair missing one leg"
+]
+    
+
+    b = random.choice(things)
+    if update.message.reply_to_message:
+        user = update.message.reply_to_message.from_user
+
+        await update.message.reply_text(f" {user.first_name} got f*cked by {b}")
+
+
+    elif len(context.args)>0:
+        a = context.args[0]
+        await update.message.reply_text(f"{a} got f*cked by {b}")
+
+    else:
+        await update.message.reply_text(
+            "reply to a user otherwise i will f*ck u"
+        )
+
+# ==============roast -==================
+async def roast(update, context):
+    roasts = [
+        "itna slow hai ki loading screen bhi isse aage nikal jati hai.",
+        "iske dimaag ka password shayad ye khud bhi bhool chuka hai.",
+        "itna unlucky hai ki lucky draw me bhi extra homework jeet leta hai.",
+        "iska future abhi bhi buffering me hai.",
+        "itna confused rehta hai ki GPS isse directions puchta hai.",
+        "iske marks aur attendance dono hide and seek khel rahe hain.",
+        "itna bewakoof hai ki calculator me bhi ungliyon se counting karta hai.",
+        "iska Wi-Fi bhi isse connect hona nahi chahta.",
+        "itna nikamma hai ki NPC bhi isse side character samajhte hain.",
+        "iska dimaag trial version pe chal raha hai.",
+        "itna unlucky hai ki black cat bhi rasta badal leti hai.",
+        "ye wo banda hai jo exam me naam likhne me bhi sochta hai.",
+        "itna lazy hai ki alarm bhi snooze maangta hai.",
+        "iska confidence aur talent kabhi ek saath online nahi aate.",
+        "itna bekaar hai ki tutorial bhi isko skip kar deta hai.",
+        "iske jokes sunke cricket stadium me bhi sannata chha jaye.",
+        "itna broke hai ki wallet kholte hi hawa nikalti hai.",
+        "ye spoon ke instructions bhi padh leta hai.",
+        "itna unlucky hai ki raincoat pehenke bhi bheeg jata hai.",
+        "iska rizz dekhke friendzone bhi sharma jaye.",
+        "itna dumb hai ki fridge me Wi-Fi dhoondhta hai.",
+        "iska IQ room temperature se competition karta hai.",
+        "itna useless hai ki group project me naam bhi galat likhwa deta hai.",
+        "ye wo banda hai jo Ctrl+Z real life me try karega.",
+        "itna slow hai ki snail bhi overtake kar jaye.",
+        "iske dimaag me thoughts nahi, ads chalti hain.",
+        "itna unlucky hai ki CAPTCHA bhi robot bol deta hai.",
+        "ye banda Google ka bhi confidence gira deta hai.",
+        "itna confused hai ki mirror me khud ko dekh ke hi sochta hai 'ye kaun hai?'",
+        "iska dimaag airplane mode pe permanently atka hua hai.",
+        "itna bekaar hai ki motivational quotes bhi haar maan jaye.",
+        "iska future dekhke astrologer bhi resign kar de.",
+        "itna slow hai ki Internet Explorer isse race jeet jaye.",
+        "ye banda attendance se zyada absent rehta hai.",
+        "itna dumb hai ki charger ko battery charge karta samajhta hai.",
+        "iska luck dekhke lottery bhi block kar de.",
+        "itna nikamma hai ki do brain cells me bhi network issue hai.",
+        "ye banda YouTube Shorts dekhke research complete maanta hai.",
+        "itna confused hai ki Monday ko Sunday wish kar deta hai.",
+        "iska dimaag low battery warning pe chal raha hai.",
+        "itna useless hai ki calculator bhi isko galat answer de.",
+        "ye banda dark mode me bhi bright lagta hai.",
+        "itna unlucky hai ki free trial bhi expire ho jaye.",
+        "iska common sense leave pe gaya hua hai.",
+        "itna dumb hai ki microwave me phone charge karega.",
+        "ye banda khud ke joke pe bhi explanation deta hai.",
+        "itna bekaar hai ki AI bhi isko human error bol de.",
+        "iska future dekhke loading bar bhi ruk jaye.",
+        "itna confused hai ki password hint bhi hint maangti hai.",
+        "ye banda dictionary me 'skill issue' ke saamne milega.",
+        "ye banda airplane mode me network dhoondhta hai.",
+        "itna confused hai ki khud ko hi seen karke reply na kare.",
+        "iska luck free fire ke loot se bhi kharab hai.",
+        "itna bekaar hai ki AI bhi isko typo samjhe.",
+        "ye banda raincoat me sunscreen lagata hai.",
+        "itna dumb hai ki USB 5 baar ulta lagaye.",
+        "iska dimaag beta version me atka hua hai.",
+        "itna unlucky hai ki birthday pe bhi homework mile.",
+        "ye banda mute hoke bhi disturb kare.",
+        "itna slow hai ki ads bhi isse fast chalti hain.",
+        "iska logic calculator ko depression de de.",
+        "itna confused hai ki logout karke password reset kare.",
+        "ye banda YouTube pe TV dekhne jata hai.",
+        "itna nikamma hai ki doormat bhi isse zyada useful hai.",
+        "iska future dekhke astrologer network error bol de.",
+        "itna dumb hai ki Bluetooth ko daant ki problem samjhe.",
+        "ye banda dictionary me 'fail' ke saamne milega.",
+        "itna unlucky hai ki pen exam ke beech me hi khatam ho jaye.",
+        "iska brain startup sound pe hi freeze ho jata hai.",
+        "itna slow hai ki notification aane ke baad react kare kal.",
+        "ye banda elevator me bhi traffic jam laga de.",
+        "itna confused hai ki khud ko hi fake account samjhe.",
+        "iska common sense vacation pe gaya hua hai.",
+        "itna dumb hai ki online test me notebook charge kare.",
+        "ye banda fridge kholke Wi-Fi signal check kare.",
+        "itna unlucky hai ki lottery ticket bhi isko block kar de.",
+        "iska future abhi under maintenance hai.",
+        "itna bekaar hai ki background character bhi isko roast kare.",
+        "ye banda Ctrl+S real life me try kare.",
+        "itna slow hai ki rewind bhi isko overtake kar de.",
+        "iska brain error 404: intelligence not found.",
+        "itna slow hai ki kachua bhi isko speed tips deta hai.",
+        "iska dimaag startup se pehle hi crash ho jata hai.",
+        "itna unlucky hai ki free gift me bill milta hai.",
+        "ye banda calculator me bhi copy check karta hai.",
+        "itna confused hai ki answer milne ke baad question bhool jata hai.",
+        "iska future dekhke future bhi tension me aa jaye.",
+        "itna bekaar hai ki recycle bin bhi isko accept na kare.",
+        "ye banda exam hall me jaake Wi-Fi password puchta hai.",
+        "itna dumb hai ki torch ko andhera dhoondhne ke liye use karta hai.",
+        "iska common sense warranty ke bahar hai.",
+        "itna nikamma hai ki shadow bhi saath chalna chhod de.",
+        "ye banda motivational video dekhke so jata hai.",
+        "itna unlucky hai ki coin toss me coin hi gayab ho jaye.",
+        "iska confidence dekhke overconfidence bhi sharma jaye.",
+        "itna slow hai ki buffering bhi impatient ho jaye.",
+        "ye banda answer dekhke question change kar deta hai.",
+        "itna useless hai ki mute button bhi isko ignore kare.",
+        "iska dimaag Windows Vista pe chal raha hai.",
+        "itna confused hai ki khud ko hi wrong number bol de.",
+        "ye banda pen drive me petrol bhar de.",
+        "itna dumb hai ki password ko password hi rakhta hai.",
+        "iska luck dekhke unlucky log motivate ho jate hain.",
+        "itna bekaar hai ki loading circle bhi isko judge kare.",
+        "ye banda YouTube comments ko research maanta hai.",
+        "itna slow hai ki snail isko taxi offer kare.",
+        "iska brain update ke baad bhi bugged hai.",
+        "itna unlucky hai ki alarm bhi late bajta hai.",
+        "ye banda map dekhke bhi bhatak jata hai.",
+        "itna nikamma hai ki calculator bhi resign kar de.",
+        "iska future PDF ki tarah password protected hai.",
+        "itna dumb hai ki keyboard me engine oil daal de.",
+        "ye banda spoon se soup nahi, soup se spoon khata hai.",
+        "itna confused hai ki khud ki birthday date verify karta hai.",
+        "iska GPA dekhke numbers bhi ro pade.",
+        "itna unlucky hai ki shadow bhi ulta padti hai.",
+        "ye banda online class me attendance miss kar de.",
+        "itna slow hai ki yesterday bhi iska wait kare.",
+        "iska dimaag low storage warning deta rehta hai.",
+        "itna bekaar hai ki autocorrect bhi haar maan le.",
+        "ye banda captcha me apna naam likh deta hai.",
+        "itna dumb hai ki headphones ko charger samajh le.",
+        "iska logic dekhke logic bhi uninstall ho jaye.",
+        "itna unlucky hai ki screenshot bhi blur aaye.",
+        "ye banda assignment submit karke file attach karna bhool jaye.",
+        "itna slow hai ki echo bhi isse pehle jawab de de.",
+        "iska future loading... loading... loading...",
+        "itna nikamma hai ki NPC isko side quest bana de.",
+        "ye banda Google pe 'Google' search karta hai.",
+        "itna confused hai ki mirror ko twin samajhta hai.",
+        "iska confidence internet ke signal jaisa unstable hai.",
+        "itna dumb hai ki calculator ka answer double-check karta hai.",
+        "ye banda 1 minute Maggi ko 20 minute lagata hai.",
+        "itna unlucky hai ki charging pe lagake bhi battery kam ho jaye.",
+        "iska dimaag power saving mode me permanently hai.",
+        "itna bekaar hai ki tutorial bhi skip ho jaye.",
+        "ye banda OTP aane se pehle expire kar de.",
+        "itna confused hai ki left-right decide karne coin toss karta hai.",
+        "iska brain lag ke saath aata hai.",
+        "itna slow hai ki Google bhi buffering dikhaye.",
+        "ye banda exam me naam galat likh de.",
+        "itna unlucky hai ki free sample me bhi tax lage.",
+        "iska common sense absentee list me hai.",
+        "itna dumb hai ki calculator ko smart samajhta hai.",
+        "ye banda charger dhoondte dhoondte phone kho de.",
+        "itna nikamma hai ki group project me bhi remove ho jaye.",
+        "iska future dekhke crystal ball crack ho jaye.",
+        "itna slow hai ki turtle bhi isko noob bole.",
+]
+    
+
+    b = random.choice(roasts)
+    if update.message.reply_to_message:
+        user = update.message.reply_to_message.from_user
+
+        await update.message.reply_text(f" {user.first_name} {b}")
+
+
+    elif len(context.args)>0:
+        a = context.args[0]
+        await update.message.reply_text(f"{a} {b}")
+
+    else:
+        await update.message.reply_text(
+            "reply to a user otherwise i will roast  u"
+        )
+
+# ============= arrest =================
+async def arrest(update, context):
+    reasons = [
+    "had se zyada bakchodi karne ke liye",
+    "class me padhai ki acting karne ke liye",
+    "apni aukaat se zyada rizz dikhane ke liye",
+    "teacher ko 'bro' bolne ke liye",
+    "machhar ki girlfriend churaane ke liye",
+    "2 rupaye ke liye dosti todne ke liye",
+    "group project me mutthi ka plan banane ke liye",
+    "free Wi-Fi ka durupyog karne ke liye",
+    "bina wajah sigma banne ke liye",
+    "khud ke joke pe khud hasne ke liye",
+    "dimaag ghar pe bhool aane ke liye",
+    "attendance se bhaagne ke liye",
+    "exam me bhagwan ko yaad karne ke liye",
+    "barber ke saath atyachar karne ke liye",
+    "WhatsApp University se degree lene ke liye",
+    "padhai se purani dushmani rakhne ke liye",
+    "parai aurat ke sath flirt karte hue pakde jaane ke liye",
+    "public me mootne ke liye",
+    "captain bakchod banne ke liye",
+    "har baat me 'trust me bro' bolne ke liye",
+    "apni hi kahani me villain banne ke liye",
+    "dost ka charger churaane ke liye",
+    "machhar ko emotional damage dene ke liye",
+    "bina talent ke overconfidence rakhne ke liye",
+    "common sense ki cha modne ke liye",
+    "ulta USB lagane ki 17vi koshish ke liye",
+    "gpt se bhi bewakoofi wale sawaal puchne ke liye",
+    "gali ke kutto ko chedne ke liye",
+    "har jagah beech me l*nd ke liye",
+    "khali dimaag me bakchodi bharne ke liye",
+    "pura din online rehne ke liye",
+    "exam ke ek din pehle padhne ke liye",
+    "gharwalo ko tension dene ke liye",
+    "friendzone me permanent address banane ke liye",
+    "khud ko chigma samajhne ke liye",
+    "dimag ki jagah gobar istemaal karne ke liye",
+    "bevajah attitude dikhane ke liye",
+    "public kamod jaisi shakal rakhne ke liye",
+    "padhai ko ignore karke gc me bkcd krne ke liye",
+    "dost ki setting tudwaane ke liye",
+    "chappal khaane layak harkate karne ke liye",
+    "faltu gyaan khodne ke liye",
+    "har game me noob niklne ke liye",
+    "room saaf na karne ke liye",
+    "khud ko sigma bolne ke liye",
+    "apni hi beizzati karwaane ke liye",
+    "teacher ke sapno me aane ke liye",
+    "bina wajah muh kholne ke liye",
+    "bakchodi ki had paar karne ke liye",
+    "desh ke IQ ko nuksaan pahunchane ke liye",
+    "gande memes failane ke liye",
+    "zinda hoke bhi kuch na karne ke liye",
+    "sasti harkate karne ke liye",
+    "gharwalo ka data waste karne ke liye",
+    "rizz ke naam pe apmaan karne ke liye",
+    "dimaag ki jagah hawa bharne ke liye",
+    "har jagah muh maarne ke liye",
+    "group chat ko pareshaan karne ke liye",
+    "apni shakal se public ko daraane ke liye",
+    "overacting karne ke liye",
+    "aalsi hone ki duniya bhar ki seema todne ke liye",
+    "kaam ke time gayab ho jaane ke liye",
+    "apni hi team ka dushman banne ke liye",
+    "bevajah cool banne ke liye",
+    "itna single hone ke liye ki police ko shak ho gaya",
+    "shampoo ki instructions padhne ke liye",
+    "apne dimaag ko berozgaar rakhne ke liye",
+    "gali ke bachcho se harne ke liye",
+    "mobile ko zindagi samajhne ke liye",
+    "har cheez me shortcut dhoondhne ke liye",
+    "bina license bakchodi karne ke liye",
+    "puri duniya ka time waste karne ke liye",
+    "dost ki maggi churaane ke liye",
+    "ulta jawaab dene ke liye",
+    "khud ko Einstein ka rishtedaar samajhne ke liye",
+    "bewakoofi me gold medal jeetne ke liye",
+    "public me apni aukaat dikhane ke liye",
+    "har waqt faltu harkate karne ke liye",
+    "dimaag ka istemaal na karne ke liye",
+    "insaaniyat ke khilaaf bakchodi karne ke liye",
+    "single hone ke liye",
+    
+]
+
+    b = random.choice(reasons)
+    if update.message.reply_to_message:
+        user = update.message.reply_to_message.from_user
+
+        await update.message.reply_text(f" {user.first_name} is arrested👮‍♂ by bharose wala bot\n🫣reason : {b}")
+
+
+    elif len(context.args)>0:
+        a = context.args[0]
+        await update.message.reply_text(f"{a} is arrested👮‍♂ by bharose wala bot\n🫣reason: {b}")
+
+    else:
+        await update.message.reply_text(
+            "reply to a user otherwise i will arrest u"
+        )
 
 
 
@@ -1720,6 +2171,7 @@ async def say(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 #### admin check new====
+
 
 async def is_admin(update, context):
      user = await context.bot.get_chat_member( update.effective_chat.id, update.effective_user.id )
@@ -3251,8 +3703,11 @@ app.add_handler(CommandHandler("broadcast",broadcast))
 app.add_handler(CommandHandler("cbroadcast",cbroadcast))
 app.add_handler(CommandHandler("gbroadcast",gbroadcast))
 app.add_handler(CommandHandler("totalusers",totalusers))
+
 app.add_handler(CommandHandler("menu",menu))
 app.add_handler(CommandHandler("game",game))
+app.add_handler(CommandHandler("arrest",arrest))
+
 app.add_handler(CommandHandler("truth",truth))
 app.add_handler(CommandHandler("dare",dare))
 
@@ -3289,6 +3744,8 @@ app.add_handler(CommandHandler("ban", ban))
 app.add_handler(CommandHandler("bam", bam))
 app.add_handler(CommandHandler("unban", unban))
 app.add_handler(CommandHandler("kick", kick))
+app.add_handler(CommandHandler("fuck", fuck))
+app.add_handler(CommandHandler("roast", roast))
 
 app.add_handler(CommandHandler("mute", mute))
 app.add_handler(CommandHandler("unmute", unmute))
