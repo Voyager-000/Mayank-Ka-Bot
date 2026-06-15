@@ -1,15 +1,12 @@
 import random 
 import asyncio
-import requests
+
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram import InlineKeyboardButton , InlineKeyboardMarkup
 from telegram.ext import CallbackQueryHandler
 from telegram import ChatPermissions
 from telegram.ext import MessageHandler, filters
-from io import BytesIO
-
-
 
 
 
@@ -24,17 +21,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("data.txt","a") as f:
             f.write(f"user id ; {userid}\n")
 
-    await update.message.reply_text(f"hello {name} bhai!!\n use /help to know what this bot can do..")
+    await update.message.reply_text(f"hello {name} bhai!!\n use /menu to know what this bot can do..")
 
 
-async def help(update: Update , context:ContextTypes.DEAFAULT_TYPE):
+# =========== main buttons =====================
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    userid = update.effective_user.id
+    user_id = update.effective_user.id
     with open("data_all.txt","r") as f:
         content = f.read()
-    if str(userid) not in content:
+    if str(user_id) not in content:
         with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
+            f.write(f"{user_id}\n")
 
 
     chatid = update.effective_chat.id
@@ -43,35 +41,26 @@ async def help(update: Update , context:ContextTypes.DEAFAULT_TYPE):
     if str(chatid) not in contentchat:
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n\n")
-    await update.message.reply_text(
-        "🚨disclaimer !!! bot slow hai....\n\n"
-        "♥what this bot can do....  \n \n \n"
-        "1. 🤬 gaali gloj \n       "
-        " /surprise [name] \n\n\n" 
-        "2. 🟰 calculation \n      " 
-        "/cal x () y \n            " 
-        "() can be + , - , * , / , ^ \n      " 
-        "/sum x y\n      " 
-        "/sub x y\n      " 
-        "/mul x y\n      " 
-        "/div x y\n\n      "
-        "/table x --- table of x\n\n      "
-        "/prime x --- to check x is prime or not \n\n\n"
-        "3. rock🪨 , paper 🗒 , scissor✂ \n      " 
-        "/rps [choice] --- choice = r/p/s\n            " 
-        "eg /rps r---- (rock chossed)\n\n\n" 
-        "4. 🎲 roll a dice & 🪙 toss a coin \n      " \
-        "/roll --- dice roll\n      " \
-        "/toss --- coin toss\n\n\n" \
-        "5. 🤞 truth and dare\n      " \
-        "/truth --- truth\n      " \
-        "/dare --- dare\n\n\n" \
-        "🕹 number guess game\n      "
-        "/numguess -- to play" )
-    
 
-#=========================== buttons =======================
-async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("⚙ Group manage",callback_data="manage")],
+        [InlineKeyboardButton("🎮 games",callback_data="game")],
+        [InlineKeyboardButton("🤬 gaali gloj",callback_data="gali")],
+        [InlineKeyboardButton("🗒 save notes",callback_data="save")],
+        [InlineKeyboardButton("🟰 calculator",callback_data="calculator")],
+        [InlineKeyboardButton("🗣 say something",callback_data="say")],
+        [InlineKeyboardButton("🦍other commands",callback_data="other")],
+        [InlineKeyboardButton("💘give feedback",callback_data="feed")],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        "what this bot can do ",
+        reply_markup=reply_markup
+    )
+
+async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     userid = update.effective_user.id
     with open("data_all.txt","r") as f:
@@ -88,13 +77,15 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
 
-    keyboard = [
-        [InlineKeyboardButton("rock🪨 , paper 🗒 , scissor✂", callback_data="rps"),
-         InlineKeyboardButton("number guess", callback_data="numgame"),
-         InlineKeyboardButton("truth and dare 🤞", callback_data="truthdare")]
+    keyboard2 = [
+        [InlineKeyboardButton("rock🪨 , paper 🗒 , scissor✂", callback_data="rps")],
+        [InlineKeyboardButton("number guess", callback_data="numgame")],
+         [InlineKeyboardButton("truth and dare 🤞", callback_data="truthdare")],
+         [InlineKeyboardButton("dice roll🎲", callback_data="dice")],
+         [InlineKeyboardButton("toss coin🪙", callback_data="toss"),]
     ]
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(keyboard2)
 
     await update.message.reply_text(
         "games available here....🎮",
@@ -107,7 +98,42 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.answer()
 
-    if query.data == "rps":
+    if query.data == "manage":
+        await query.message.reply_text(
+            "⚙ group manage commands\n\n\n"
+            "/ban /unban --- to ban/unban users\n" \
+            "/bam -- fake ban 😄\n"
+            "/kick -- remove a user\n"
+            "/mute /unmute --- to mute/unmute users\n\n" \
+            "/id /info --- to get info of a member\n"
+            "/pin -- pin a messege\n" \
+            "/lock /unlock  --- to restrict users to send stickers/links/media\n\n" \
+            "/setwelcome --- set messege when new user joins \n" \
+            "/setgoodbye --- set messege when a user lefts\n\n" \
+            "/del --- delete a messege\n" \
+            "/purge --- delete all next messege from selected messege\n\n" \
+            "/promote --- make a user admin with all power\n" \
+            "/sastapromote --- admin with no power\n" \
+            "/demote --- remove from admin"
+        )
+    elif query.data == "game":
+
+        keyboard = [[ 
+             InlineKeyboardButton("rock🪨 , paper 🗒 , scissor✂", callback_data="rps"),
+             InlineKeyboardButton("number guess", callback_data="numgame"),
+             InlineKeyboardButton("truth and dare 🤞", callback_data="truthdare"),
+             InlineKeyboardButton("dice roll🎲", callback_data="dice"),
+             InlineKeyboardButton("toss coin🪙", callback_data="toss"),        
+        ]]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await query.message.reply_text(
+        "games available here....🎮",
+        reply_markup=reply_markup
+            )
+        
+    elif query.data == "rps":
         await query.message.reply_text(
             "/rps <r/p/s>"
         )
@@ -120,6 +146,57 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
          await query.message.reply_text(
               " play with /truth and /dare"
          )
+    elif query.data == "toss":
+         await query.message.reply_text(
+              "toss coin with /toss"
+         )
+    elif query.data == "dice":
+         await query.message.reply_text(
+              "role a dice with /roll"
+         )
+    elif query.data == "gali":
+         await query.message.reply_text(
+              "/surprise <name>"
+         )
+    elif query.data == "save":
+         await query.message.reply_text(
+              "/save <kaam ki cheez jo save krni ho>"
+         )
+    elif query.data == "calculator":
+         await query.message.reply_text(
+              "🟰 calculation \n      " 
+        "/cal x () y \n            " 
+        "() can be + , - , * , / , ^ \n      " 
+        "/sum x y\n      " 
+        "/sub x y\n      " 
+        "/mul x y\n      " 
+        "/div x y\n\n      "
+        "/table x --- table of x\n\n      "
+        "/prime x --- to check x is prime or not"
+         )
+
+    elif query.data == "feed":
+         await query.message.reply_text(
+              "suggest what to add in bot ,, or anything u want to say to owner\n\n" \
+              "/feedback <text>"
+         )
+
+    elif query.data == "other":
+         await query.message.reply_text(
+             "some other commands \n\n\n"
+            "/flirt <name> ---- pickup line❣\n" \
+            "/nude ----- just something 🌚\n" \
+            "/luck ---- just bkcd to predict luck\n" 
+            "/hi ---- namaste\n" \
+            "/bye ----- bye"
+         )
+
+    elif query.data == "say":
+         await query.message.reply_text(
+             "/say <text> ---- to say smtng\n" \
+             "/say100 <text> ---- to say smtng in loop"
+         )
+
 
 # ============= broadcast ===========================
 
@@ -186,11 +263,11 @@ async def totalusers(update , context):
 # ============== grp broadcast =============
 
 async def gbroadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-     grpid = -1003262453436
+     grpid = -1003859461035
      msg = " ".join(context.args)
 
      try:
-            grpid = -1003262453436
+            grpid = -1003859461035
 
             await context.bot.send_message(
                 chat_id= grpid ,
@@ -1414,46 +1491,46 @@ async def rps(update, context):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
 
-        you = context.args[0]
-        c = random.choice([1,-1,0])
-        youdic = {"r":1 , "p":0 , "s":-1}
+    you = context.args[0]
+    c = random.choice([1,-1,0])
+    youdic = {"r":1 , "p":0 , "s":-1}
 
-        if(you in youdic):
-            younum = youdic[you]
-            revdic = {1:"rock",0:"paper",-1:"scissor"}
+    if(you in youdic):
+        younum = youdic[you]
+        revdic = {1:"rock",0:"paper",-1:"scissor"}
 
-            if(younum==1 and c==1):
+        if(younum==1 and c==1):
                     await update.message.reply_text(f" draw 🟰 \n your choice {revdic[younum]} 🪨 , computers choice {revdic[c]}🪨") 
     
-            elif(younum==1 and c==0):
+        elif(younum==1 and c==0):
                     await update.message.reply_text(f" you lost ❌  \n your choice {revdic[younum]} 🪨 , computers choice {revdic[c]} 🗒")
     
                         
-            elif(younum==1 and c==-1):
+        elif(younum==1 and c==-1):
                     await update.message.reply_text(f" you won .✅. \n your choice {revdic[younum]} 🪨 , computers choice {revdic[c]}✂")
 
 
-            elif(younum==0 and c==0): 
+        elif(younum==0 and c==0): 
                     await update.message.reply_text(f" draw 🟰 \n your choice {revdic[younum]} 🗒 , computers choice {revdic[c]} 🗒")
 
                     
-            elif(younum==0 and c==-1):
+        elif(younum==0 and c==-1):
                     await update.message.reply_text(f" you lost ❌  \n your choice {revdic[younum]} 🗒 , computers choice {revdic[c]}✂")
 
 
-            elif(younum==0 and c==1):
+        elif(younum==0 and c==1):
                     await update.message.reply_text(f" you won .✅. \n your choice {revdic[younum]} 🗒 , computers choice {revdic[c]} 🪨") 
 
 
-            elif(younum==-1 and c==-1):
+        elif(younum==-1 and c==-1):
                     await update.message.reply_text(f" draw 🟰 \n your choice {revdic[younum]}✂ , computers choice {revdic[c]}")
 
                     
-            elif(younum==-1 and c==1):
+        elif(younum==-1 and c==1):
                     await update.message.reply_text(f" you lost ❌  \n your choice {revdic[younum]} ✂, computers choice {revdic[c]} 🪨 ") 
 
                     
-            elif(younum==-1 and c==0):
+        elif(younum==-1 and c==0):
                     await update.message.reply_text(f" you won .✅. \n your choice {revdic[younum]}✂ , computers choice {revdic[c]} 🗒")
 
 
@@ -1746,59 +1823,7 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-# ================= BAN =================
 
-async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-    
-    # Non-admin check
-    if not await admin_only(update, context):
-        return
-
-    # Admin ke paas ban permission hai ya nahi
-    member = await context.bot.get_chat_member(
-        update.effective_chat.id,
-        update.effective_user.id
-    )
-
-    if member.status != "creator" and not member.can_restrict_members:
-        await update.message.reply_text(
-            "❌ You are admin, but you don't have Ban Users permission.\n simply aapke admin post ki aukaat kam h "
-        )
-        return
-
-    # Bot ke paas ban permission hai ya nahi
-    bot_member = await context.bot.get_chat_member(
-        update.effective_chat.id,
-        context.bot.id
-    )
-
-    if bot_member.status != "administrator":
-        await update.message.reply_text(
-            "❌ Make me an admin first. \n then i can do something crazzy "
-        )
-        return
-
-    if not bot_member.can_restrict_members:
-        await update.message.reply_text(
-            "😭 bsdk bhai mere paas permission nhi h ban krne ki "
-        )
-        return
-    
 
 # ================= BAN =================
 
@@ -3071,6 +3096,17 @@ async def lock_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
 WELCOME = {}
 GOODBYE = {}
 
+DEFAULT_WELCOME = """
+👋 Welcome {name}!
+
+Group me swagat hai 🎉
+"""
+
+DEFAULT_GOODBYE = """
+{name} left !
+
+"""
+
 async def setwelcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not await admin_only(update, context):
@@ -3089,6 +3125,38 @@ async def setwelcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "✅ Welcome message saved."
     )
+
+
+async def welcome_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not update.message.new_chat_members:
+        return
+
+    chat_id = update.effective_chat.id
+
+    for member in update.message.new_chat_members:
+
+        # Custom welcome set hai
+        if chat_id in WELCOME:
+            try:
+                await context.bot.copy_message(
+                    chat_id=chat_id,
+                    from_chat_id=chat_id,
+                    message_id=WELCOME[chat_id]
+                )
+            except:
+                pass
+
+        # Default welcome
+        else:
+            await update.message.reply_text(
+                DEFAULT_WELCOME.format(
+                    name=member.first_name
+                )
+            )
+
+
+
 
 async def setgoodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -3109,57 +3177,51 @@ async def setgoodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ Goodbye message saved."
     )
 
-async def welcome_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if not update.message.new_chat_members:
-        return
-
-    chat_id = update.effective_chat.id
-
-    if chat_id not in WELCOME:
-        return
-
-    saved_message_id = WELCOME[chat_id]
-
-    for member in update.message.new_chat_members:
-
-        try:
-            await context.bot.copy_message(
-                chat_id=chat_id,
-                from_chat_id=chat_id,
-                message_id=saved_message_id
-            )
-        except:
-            pass
-
-
 async def goodbye_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not update.message.left_chat_member:
         return
 
     chat_id = update.effective_chat.id
+    member = update.message.left_chat_member
 
-    if chat_id not in GOODBYE:
-        return
 
-    saved_message_id = GOODBYE[chat_id]
 
-    try:
-        await context.bot.copy_message(
-            chat_id=chat_id,
-            from_chat_id=chat_id,
-            message_id=saved_message_id
-        )
-    except:
-        pass
+        # Custom welcome set hai
+    if chat_id in GOODBYE:
+            try:
+                await context.bot.copy_message(
+                    chat_id=chat_id,
+                    from_chat_id=chat_id,
+                    message_id=GOODBYE[chat_id]
+                )
+            except:
+                pass
 
+        # Default welcome
+    else:
+            await update.message.reply_text(
+                DEFAULT_GOODBYE.format(
+                    name=member.first_name
+                )
+            )
+
+# ==================feedback ========================
+
+
+async def feedback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    a = " ".join(context.args)
+    userid = update.effective_user.id
+    name = update.effective_user.first_name
+    with open("feedback.txt","a",encoding="utf-8") as f:
+        f.write(f"{name}|{userid} |---  {a}\n")
+    await update.message.reply_text("feedback sent to admin ;)")
 
 
 
 app = Application.builder().token(TOKEN).build()
 
-app.add_handler(CommandHandler("Start", start))
+app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("hi", hi))
 
 app.add_handler(CommandHandler("say", say))
@@ -3190,9 +3252,12 @@ app.add_handler(CommandHandler("cbroadcast",cbroadcast))
 app.add_handler(CommandHandler("gbroadcast",gbroadcast))
 app.add_handler(CommandHandler("totalusers",totalusers))
 app.add_handler(CommandHandler("menu",menu))
+app.add_handler(CommandHandler("game",game))
 app.add_handler(CommandHandler("truth",truth))
 app.add_handler(CommandHandler("dare",dare))
+
 app.add_handler(CallbackQueryHandler(button))
+
 
 app.add_handler(CommandHandler("id", id))
 app.add_handler(CommandHandler("info", info))
@@ -3238,5 +3303,9 @@ app.add_handler(CommandHandler("promotesecret", promotesecret))
 app.add_handler(CommandHandler("demote", demote))
 
 
+app.add_handler(CommandHandler("feedback", feedback))
+
+
 print("Bot is running...")
 app.run_polling()   
+
