@@ -1,5 +1,6 @@
 import random 
 import asyncio
+import os
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
@@ -10,7 +11,7 @@ from telegram.ext import MessageHandler, filters
 
 
 
-TOKEN = "8683383164:AAFPqh13Tb1-pdib74Mt67YpqshG-Zez7ww"
+TOKEN = os.getenv("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
