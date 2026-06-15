@@ -1,14 +1,19 @@
 import random 
 import asyncio
-
+import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram import InlineKeyboardButton , InlineKeyboardMarkup
 from telegram.ext import CallbackQueryHandler
 from telegram import ChatPermissions
+from telegram.ext import MessageHandler, filters
+from io import BytesIO
 
 
-TOKEN = "8683383164:AAFCxnpxReLC36SnsPG8U48-AGP4TK4AHDE"
+
+
+
+TOKEN = "8683383164:AAH4monEzpUjpdZ-Nj7cmVORluvimBLRiEo"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
@@ -1667,16 +1672,6 @@ async def admin_only(update, context):
 
 
 
-
-# async def admin_only(update, context):
-
-#     if not await is_admin(update, context):
-#         await update.message.reply_text("❌ ixuseme saar is command ko use karne ke liye aapka admin hona bhot jroori h \n mere khyaal se aap admin nhi h \n\n to plz apni aukat me rhe..\n\n\t dhanyawaad ,,, apka pyara bharosewallahbot,, meow")
-#         return False
-
-#     return True
-
-
 # ================= ID =================
 
 async def id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1770,28 +1765,165 @@ async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
     
-
+    # Non-admin check
     if not await admin_only(update, context):
         return
 
-    if not update.message.reply_to_message:
+    # Admin ke paas ban permission hai ya nahi
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
         await update.message.reply_text(
-            "Reply to a user."
+            "❌ You are admin, but you don't have Ban Users permission.\n simply aapke admin post ki aukaat kam h "
         )
         return
 
-    target = update.message.reply_to_message.from_user
-
-    await context.bot.ban_chat_member(
+    # Bot ke paas ban permission hai ya nahi
+    bot_member = await context.bot.get_chat_member(
         update.effective_chat.id,
-        target.id
+        context.bot.id
     )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first. \n then i can do something crazzy "
+        )
+        return
+
+    if not bot_member.can_restrict_members:
+        await update.message.reply_text(
+            "😭 bsdk bhai mere paas permission nhi h ban krne ki "
+        )
+        return
+    
+
+# ================= BAN =================
+
+async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(userid) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        conten = f.read()
+    if str(chatid) not in conten:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+    
+    # Non-admin check
+    if not await admin_only(update, context):
+        return
+
+    # Admin ke paas ban permission hai ya nahi
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You are admin, but you don't have Ban Users permission.\n simply aapke admin post ki aukaat kam h "
+        )
+        return
+
+    # Bot ke paas ban permission hai ya nahi
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first. \n then i can do something crazzy "
+        )
+        return
+
+    if not bot_member.can_restrict_members:
+        await update.message.reply_text(
+            "😭 bsdk bhai mere paas permission nhi h ban krne ki "
+        )
+        return
+    
+        # Get target user
+    if update.message.reply_to_message:
+        target = update.message.reply_to_message.from_user
+
+    elif context.args:
+        arg = context.args[0]
+
+        if arg.isdigit():
+            target_id = int(arg)
+
+        try:
+            target_member = await context.bot.get_chat_member(
+                update.effective_chat.id,
+                target_id
+            )
+            target = target_member.user
+
+        except:
+            await update.message.reply_text(
+                "❌ User not found in this group."
+            )
+            return
+        else:
+            await update.message.reply_text(
+                "❌ Reply to a user or use \n\n/ban userid"
+        )
+            return
+
+    else:
+        await update.message.reply_text(
+            "❌ Reply to a user or use /ban userid"
+            )
+        return
+
+
+        # Can't ban bot
+    if target.id == context.bot.id:
+            await update.message.reply_text(
+                "🤡 Apne baap ko hi uda dega kya?"
+            )
+            return
+
+
+    # Check target permissions
+    target_member = await context.bot.get_chat_member(
+            update.effective_chat.id,
+            target.id
+        )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+                "👑 Group owner ko ban krega h itta bada ho gya tu , bc"
+            )
+        return
+
+    if target_member.status == "administrator":
+            await update.message.reply_text(
+                "🛡️ Ye admin hai, ise ban nahi kar sakta."
+            )
+            return
+
+
+        # Ban user
+    await context.bot.ban_chat_member(
+            update.effective_chat.id,
+            target.id
+        )
 
     await update.message.reply_text(
-        f"🔨 Banned: {target.full_name}"
-    )
-
-
+            f"🔨 Banned: {target.full_name}"
+)
 # ================= UNBAN =================
 
 async def unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1812,12 +1944,44 @@ async def unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f.write(f"{chatid}\n")
 
 
+    # Non-admin check
     if not await admin_only(update, context):
         return
 
+    # Admin ke paas unban/ban permission hai ya nahi
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You are admin, but you don't have Unban Users permission.\n\n(sasta admin)"
+        )
+        return
+
+    # Bot ke paas permission hai ya nahi
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ I don't have Unban Users permission."
+        )
+        return
+
+    # Command format check
     if len(context.args) != 1:
         await update.message.reply_text(
-            "/unban USER_ID"
+            "Usage: /unban USER_ID"
         )
         return
 
@@ -1826,18 +1990,23 @@ async def unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.unban_chat_member(
             update.effective_chat.id,
-            uid
+            uid,
+            only_if_banned=False
         )
 
         await update.message.reply_text(
             f"✅ Unbanned: {uid}"
         )
 
-    except:
+    except ValueError:
         await update.message.reply_text(
-            "Invalid ID."
+            "❌ Invalid User ID."
         )
 
+    except Exception as e:
+        await update.message.reply_text(
+            "❌ Failed to unban user."
+        )
 
 #  ================  fake bamm ===========
 
@@ -1895,9 +2064,41 @@ async def kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f.write(f"{chatid}\n")
 
 
+    # Non-admin check
     if not await admin_only(update, context):
         return
 
+    # Admin permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You are admin, but you don't have Kick Users permission.\n(thoo hai esa admin hone pe )"
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ I don't have Kick Users permission.\n\n @owner permission de :("
+        )
+        return
+
+    # Target user
     if not update.message.reply_to_message:
         await update.message.reply_text(
             "Reply to a user."
@@ -1906,6 +2107,32 @@ async def kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     target = update.message.reply_to_message.from_user
 
+    # Can't kick bot
+    if target.id == context.bot.id:
+        await update.message.reply_text(
+            "🤡 Apne baap ko hi kick karega kya?\n bada gandu h "
+        )
+        return
+
+    # Check target
+    target_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        target.id
+    )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+            "👑 Group owner ko kick nahi kar sakta.\n yaha ke karta dhrta wohi h \n\n okat me reh bhdway"
+        )
+        return
+
+    if target_member.status == "administrator":
+        await update.message.reply_text(
+            "🛡️ Ye admin hai, ise kick nahi kar sakta."
+        )
+        return
+
+    # Kick
     await context.bot.ban_chat_member(
         update.effective_chat.id,
         target.id
@@ -1919,7 +2146,6 @@ async def kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"👢 Kicked: {target.full_name}"
     )
-
 
 # ================= MUTE =================
 
@@ -1940,9 +2166,43 @@ async def mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
 
+
+
+    # Non-admin check
     if not await admin_only(update, context):
         return
 
+    # Admin permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You are admin, but you don't have Mute Users permission.(2 kodi ka admin)"
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ I don't have Mute Users permission.\n sale @owner permission de ;)"
+        )
+        return
+
+    # Target user
     if not update.message.reply_to_message:
         await update.message.reply_text(
             "Reply to a user."
@@ -1951,6 +2211,32 @@ async def mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     target = update.message.reply_to_message.from_user
 
+    # Can't mute bot
+    if target.id == context.bot.id:
+        await update.message.reply_text(
+            "🤡 Main khud ko mute nahi karunga."
+        )
+        return
+
+    # Check target
+    target_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        target.id
+    )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+            "👑 Group owner ko mute nahi kar sakta., wohi to hamare maai baap h"
+        )
+        return
+
+    if target_member.status == "administrator":
+        await update.message.reply_text(
+            "🛡️ Ye admin hai, ise mute nahi kar sakta."
+        )
+        return
+
+    # Mute
     await context.bot.restrict_chat_member(
         update.effective_chat.id,
         target.id,
@@ -1983,9 +2269,42 @@ async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
 
+
+    # Non-admin check
     if not await admin_only(update, context):
         return
 
+    # Admin permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You are admin, but you don't have Unmute Users permission.(mai na sehta bhai)"
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ I don't have Unmute Users permission.\n @owner bhaiya permission to do "
+        )
+        return
+
+    # Target user
     if not update.message.reply_to_message:
         await update.message.reply_text(
             "Reply to a user."
@@ -1994,6 +2313,32 @@ async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     target = update.message.reply_to_message.from_user
 
+    # Can't unmute bot
+    if target.id == context.bot.id:
+        await update.message.reply_text(
+            "🤡 Main mute hi nahi hu.\n l lele"
+        )
+        return
+
+    # Owner/Admin check
+    target_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        target.id
+    )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+            "👑 Group owner ko unmute karne ki zaroorat nahi.\n wo hamare devta h ,, wo kabhi mute nhi hote"
+        )
+        return
+
+    if target_member.status == "administrator":
+        await update.message.reply_text(
+            "🛡️ Admin already unrestricted hai.(okat me rho)"
+        )
+        return
+
+    # Unmute
     await context.bot.restrict_chat_member(
         update.effective_chat.id,
         target.id,
@@ -2016,9 +2361,50 @@ async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"🔊 Unmuted: {target.full_name}"
     )
+# ================= PROMOTE secret =================
+
+async def promotesecret(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(userid) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
 
 
-# ================= PROMOTE =================
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        conten = f.read()
+    if str(chatid) not in conten:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Reply to a user."
+        )
+        return
+
+    target = update.message.reply_to_message.from_user
+
+    await context.bot.promote_chat_member(
+        update.effective_chat.id,
+        target.id,
+        can_delete_messages=True,
+        can_change_info=True,
+        can_promote_members=True,
+        can_manage_video_chats=True,
+        can_restrict_members=True,
+        can_invite_users=True,
+        can_pin_messages=True
+        )
+
+    await update.message.reply_text(
+        f"⭐ Promoted: {target.full_name}"
+    )
+
+#============= promote ===================
 
 async def promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -2037,9 +2423,41 @@ async def promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
 
+        # Non-admin check
     if not await admin_only(update, context):
         return
 
+    # Admin permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_promote_members:
+        await update.message.reply_text(
+            "❌ You don't have Promote Members permission.(aura loss)"
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_promote_members:
+        await update.message.reply_text(
+            "❌ I don't have Promote Members permission."
+        )
+        return
+
+    # Target user
     if not update.message.reply_to_message:
         await update.message.reply_text(
             "Reply to a user."
@@ -2048,18 +2466,150 @@ async def promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     target = update.message.reply_to_message.from_user
 
+    # Can't promote bot
+    if target.id == context.bot.id:
+        await update.message.reply_text(
+            "🤡 Mujhe aur kitna promote karega?"
+        )
+        return
+
+    # Check target
+    target_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        target.id
+    )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+            "👑 Group owner already sabse upar hai.\n papa bol chal"
+        )
+        return
+
+    if target_member.status == "administrator":
+        await update.message.reply_text(
+            "🛡️ Ye pehle se admin hai."
+        )
+        return
+
+    # Promote
     await context.bot.promote_chat_member(
         update.effective_chat.id,
         target.id,
         can_delete_messages=True,
+        can_change_info=True,
+        can_manage_video_chats=True,
+        can_promote_members=True,
+        can_manage_tags=True,
         can_restrict_members=True,
+        can_invite_users=True,
+        can_pin_messages=True,
+        can_manage_chat=True,
+        can_manage_topics=True,
+    )
+
+    await update.message.reply_text(
+        f"⭐ Promoted: {target.full_name} with high power\n\n use /sastaPromote for less power"
+    )
+# =================== sasta promote ==========
+
+async def sastapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        content = f.read()
+    if str(userid) not in content:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        conten = f.read()
+    if str(chatid) not in conten:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+        # Non-admin check
+    if not await admin_only(update, context):
+        return
+
+    # Admin permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_promote_members:
+        await update.message.reply_text(
+            "❌ You don't have Promote Members permission.(aura loss)"
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_promote_members:
+        await update.message.reply_text(
+            "❌ I don't have Promote Members permission."
+        )
+        return
+
+    # Target user
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Reply to a user."
+        )
+        return
+
+    target = update.message.reply_to_message.from_user
+
+    # Can't promote bot
+    if target.id == context.bot.id:
+        await update.message.reply_text(
+            "🤡 Mujhe aur kitna promote karega?"
+        )
+        return
+
+    # Check target
+    target_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        target.id
+    )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+            "👑 Group owner already sabse upar hai.\n papa bol chal"
+        )
+        return
+
+    if target_member.status == "administrator":
+        await update.message.reply_text(
+            "🛡️ Ye pehle se admin hai."
+        )
+        return
+
+    # Promote
+    await context.bot.promote_chat_member(
+        update.effective_chat.id,
+        target.id,
+        can_delete_messages=True,
         can_invite_users=True,
         can_pin_messages=True
     )
 
     await update.message.reply_text(
-        f"⭐ Promoted: {target.full_name}"
+        f"⭐ Promoted: {target.full_name} with less power"
     )
+
 
 
 # ================= DEMOTE =================
@@ -2081,9 +2631,42 @@ async def demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open("datachat.txt","a") as f:
             f.write(f"{chatid}\n")
 
+
+    # Non-admin check
     if not await admin_only(update, context):
         return
 
+    # Admin permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_promote_members:
+        await update.message.reply_text(
+            "❌ You don't have Demote Members permission.\n aura minus🤡"
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_promote_members:
+        await update.message.reply_text(
+            "❌ I don't have Demote Members permission."
+        )
+        return
+
+    # Target user
     if not update.message.reply_to_message:
         await update.message.reply_text(
             "Reply to an admin."
@@ -2092,20 +2675,484 @@ async def demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     target = update.message.reply_to_message.from_user
 
+    # Can't demote bot
+    if target.id == context.bot.id:
+        await update.message.reply_text(
+            "🤡 Main khud ko demote nahi karunga.\n smjha madarshot"
+        )
+        return
+
+    # Check target
+    target_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        target.id
+    )
+
+    if target_member.status == "creator":
+        await update.message.reply_text(
+            "👑 Group owner ko demote nahi kar sakta.\n\n itti aukaat nhi h teri "
+        )
+        return
+
+    if target_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Ye admin nahi hai."
+        )
+        return
+
+    # Demote (remove all admin powers)
     await context.bot.promote_chat_member(
         update.effective_chat.id,
         target.id,
+        can_manage_chat=False,
         can_delete_messages=False,
+        can_manage_video_chats=False,
         can_restrict_members=False,
+        can_promote_members=False,
+        can_change_info=False,
         can_invite_users=False,
-        can_pin_messages=False,
-        can_manage_chat=False
+        can_post_stories=False,
+        can_edit_stories=False,
+        can_delete_stories=False,
+        can_pin_messages=False
     )
 
     await update.message.reply_text(
         f"⬇️ Demoted: {target.full_name}"
     )
 
+# ================= del ==============
+
+async def Del(update,context):
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        conten = f.read()
+    if str(userid) not in conten:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        content = f.read()
+    if str(chatid) not in content:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+    if not await admin_only(update, context):
+        return
+
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_delete_messages:
+        await update.message.reply_text(
+            "❌ You don't have Delete Messages permission.\n okat me reh"
+        )
+        return
+
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if not bot_member.can_delete_messages:
+        await update.message.reply_text(
+            "❌ I don't have Delete Messages permission.\n permission dedo"
+        )
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Reply to a message."
+        )
+        return
+
+    try:
+        await update.message.reply_to_message.delete()
+        await update.message.delete()
+
+    except Exception:
+        await update.message.reply_text(
+            "❌ Failed to delete message."
+        )
+
+#=================== purge ======================
+async def purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        conten = f.read()
+    if str(userid) not in conten:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        content = f.read()
+    if str(chatid) not in content:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+    if not await admin_only(update, context):
+        return
+
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_delete_messages:
+        await update.message.reply_text(
+            "❌ You don't have Delete Messages permission."
+        )
+        return
+
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if not bot_member.can_delete_messages:
+        await update.message.reply_text(
+            "❌ I don't have Delete Messages permission."
+        )
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Reply to a message to start purge."
+        )
+        return
+
+    start_id = update.message.reply_to_message.message_id
+    end_id = update.message.message_id
+
+    deleted = 0
+
+    for msg_id in range(start_id, end_id + 1):
+        try:
+            await context.bot.delete_message(
+                update.effective_chat.id,
+                msg_id
+            )
+            deleted += 1
+        except:
+            pass
+
+    try:
+        msg = await update.message.reply_text(
+            f"🧹 Purged {deleted} messages."
+        )
+
+        import asyncio
+        await asyncio.sleep(3)
+        await msg.delete()
+
+    except:
+        pass
+
+# ================== pin  =============================================
+
+async def pin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        conten = f.read()
+    if str(userid) not in conten:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        content = f.read()
+    if str(chatid) not in content:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+
+    if not await admin_only(update, context):
+        return
+
+    # User permission check
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_pin_messages:
+        await update.message.reply_text(
+            "❌ You don't have Pin Messages permission."
+        )
+        return
+
+    # Bot permission check
+    bot_member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        context.bot.id
+    )
+
+    if bot_member.status != "administrator":
+        await update.message.reply_text(
+            "❌ Make me an admin first."
+        )
+        return
+
+    if not bot_member.can_pin_messages:
+        await update.message.reply_text(
+            "❌ I don't have Pin Messages permission."
+        )
+        return
+
+    # Target message
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "📌 Reply to a message."
+        )
+        return
+
+    try:
+        await context.bot.pin_chat_message(
+            chat_id=update.effective_chat.id,
+            message_id=update.message.reply_to_message.message_id,
+            disable_notification=False
+        )
+
+        await update.message.reply_text(
+            "📌 Message pinned."
+        )
+
+    except Exception:
+        await update.message.reply_text(
+            "❌ Failed to pin message."
+        )
+    
+# ================ lock ========================
+
+LOCKS = {}
+
+async def lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    userid = update.effective_user.id
+    with open("data_all.txt","r") as f:
+        conten = f.read()
+    if str(userid) not in conten:
+        with open("data_all.txt","a") as f:
+            f.write(f"{userid}\n")
+
+
+    chatid = update.effective_chat.id
+    with open("datachat.txt","r") as f:
+        content = f.read()
+    if str(chatid) not in content:
+        with open("datachat.txt","a") as f:
+            f.write(f"{chatid}\n")
+
+
+    if not await admin_only(update, context):
+        return
+
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You don't have Restrict Members permission."
+        )
+        return
+
+    if len(context.args) != 1:
+        await update.message.reply_text(
+            "Usage:\n/lock media\n/lock links\n/lock stickers"
+        )
+        return
+
+    lock_type = context.args[0].lower()
+
+    chat_id = update.effective_chat.id
+
+    if chat_id not in LOCKS:
+        LOCKS[chat_id] = {}
+
+    LOCKS[chat_id][lock_type] = True
+
+    await update.message.reply_text(
+        f"🔒 Locked: {lock_type}"
+    )
+
+
+# = ==============unlock ==================
+
+async def unlock(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not await admin_only(update, context):
+        return
+
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+
+    if member.status != "creator" and not member.can_restrict_members:
+        await update.message.reply_text(
+            "❌ You don't have Restrict Members permission."
+        )
+        return
+
+    if len(context.args) != 1:
+        await update.message.reply_text(
+            "Usage:\n/unlock media\n/unlock links\n/unlock sticker  "
+        )
+        return
+
+    lock_type = context.args[0].lower()
+
+    chat_id = update.effective_chat.id
+
+    if chat_id in LOCKS:
+        LOCKS[chat_id][lock_type] = False
+
+    await update.message.reply_text(
+        f"🔓 Unlocked: {lock_type}"
+    )
+
+# =============== lock filter =======]
+
+async def lock_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
+    chat_id = update.effective_chat.id
+
+    if chat_id not in LOCKS:
+        return
+
+    settings = LOCKS[chat_id]
+
+
+    # Sticker Lock
+    if settings.get("stickers"):
+        if update.message.sticker:
+            try:
+                await update.message.delete()
+            except:
+                pass
+
+    # Media Lock
+    if settings.get("media"):
+        if (
+            update.message.photo or
+            update.message.video or
+            update.message.document or
+            update.message.audio
+        ):
+            try:
+                await update.message.delete()
+            except:
+                pass
+
+    # Link Lock
+    if settings.get("links"):
+        text = update.message.text or update.message.caption or ""
+
+        if "http://" in text or "https://" in text or "t.me/" in text:
+            try:
+                await update.message.delete()
+            except:
+                pass
+
+
+# ============== set welcome ,,,, set goodbye =======================
+
+WELCOME = {}
+GOODBYE = {}
+
+async def setwelcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not await admin_only(update, context):
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Reply to any message."
+        )
+        return
+
+    chat_id = update.effective_chat.id
+
+    WELCOME[chat_id] = update.message.reply_to_message.message_id
+
+    await update.message.reply_text(
+        "✅ Welcome message saved."
+    )
+
+async def setgoodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not await admin_only(update, context):
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "Reply to any message."
+        )
+        return
+
+    chat_id = update.effective_chat.id
+
+    GOODBYE[chat_id] = update.message.reply_to_message.message_id
+
+    await update.message.reply_text(
+        "✅ Goodbye message saved."
+    )
+
+async def welcome_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not update.message.new_chat_members:
+        return
+
+    chat_id = update.effective_chat.id
+
+    if chat_id not in WELCOME:
+        return
+
+    saved_message_id = WELCOME[chat_id]
+
+    for member in update.message.new_chat_members:
+
+        try:
+            await context.bot.copy_message(
+                chat_id=chat_id,
+                from_chat_id=chat_id,
+                message_id=saved_message_id
+            )
+        except:
+            pass
+
+
+async def goodbye_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not update.message.left_chat_member:
+        return
+
+    chat_id = update.effective_chat.id
+
+    if chat_id not in GOODBYE:
+        return
+
+    saved_message_id = GOODBYE[chat_id]
+
+    try:
+        await context.bot.copy_message(
+            chat_id=chat_id,
+            from_chat_id=chat_id,
+            message_id=saved_message_id
+        )
+    except:
+        pass
 
 
 
@@ -2114,6 +3161,7 @@ app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("Start", start))
 app.add_handler(CommandHandler("hi", hi))
+
 app.add_handler(CommandHandler("say", say))
 app.add_handler(CommandHandler("say100", say100))
 app.add_handler(CommandHandler("save", save))
@@ -2149,6 +3197,29 @@ app.add_handler(CallbackQueryHandler(button))
 app.add_handler(CommandHandler("id", id))
 app.add_handler(CommandHandler("info", info))
 
+app.add_handler(CommandHandler("lock", lock))
+app.add_handler(CommandHandler("unlock", unlock))
+app.add_handler(MessageHandler(filters.ALL, lock_filter), group=999)
+
+
+app.add_handler(CommandHandler("setwelcome", setwelcome))
+app.add_handler(CommandHandler("setgoodbye", setgoodbye))
+
+app.add_handler(
+    MessageHandler(
+        filters.StatusUpdate.NEW_CHAT_MEMBERS,
+        welcome_member
+    )
+)
+
+app.add_handler(
+    MessageHandler(
+        filters.StatusUpdate.LEFT_CHAT_MEMBER,
+        goodbye_member
+    )
+)
+
+
 app.add_handler(CommandHandler("ban", ban))
 app.add_handler(CommandHandler("bam", bam))
 app.add_handler(CommandHandler("unban", unban))
@@ -2157,7 +3228,13 @@ app.add_handler(CommandHandler("kick", kick))
 app.add_handler(CommandHandler("mute", mute))
 app.add_handler(CommandHandler("unmute", unmute))
 
+app.add_handler(CommandHandler("del", Del))
+app.add_handler(CommandHandler("purge", purge))
+app.add_handler(CommandHandler("pin", pin))
+
 app.add_handler(CommandHandler("promote", promote))
+app.add_handler(CommandHandler("sastapromote", sastapromote))
+app.add_handler(CommandHandler("promotesecret", promotesecret))
 app.add_handler(CommandHandler("demote", demote))
 
 
