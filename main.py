@@ -10,7 +10,7 @@ from telegram.ext import MessageHandler, filters
 
 
 
-TOKEN = "8683383164:AAH4monEzpUjpdZ-Nj7cmVORluvimBLRiEo"
+TOKEN = "8683383164:AAFPqh13Tb1-pdib74Mt67YpqshG-Zez7ww"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
