@@ -9,6 +9,35 @@ from telegram.ext import CallbackQueryHandler
 from telegram import ChatPermissions
 from telegram.ext import MessageHandler, filters
 
+
+from telegram.error import BadRequest
+from telegram import Message
+import logging
+
+# Set up basic logging so we can see errors without crashing
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Monkey-patch reply_text to survive deleted messages
+original_reply_text = Message.reply_text
+
+async def safe_reply_text(self, *args, **kwargs):
+    try:
+        return await original_reply_text(self, *args, **kwargs)
+    except BadRequest as e:
+        if "Message to be replied not found" in str(e):
+            # The original message is gone, so just send the text directly to the chat!
+            kwargs['quote'] = False
+            return await self.get_bot().send_message(chat_id=self.chat_id, *args, **kwargs)
+        raise e
+
+Message.reply_text = safe_reply_text
+
+# Global Error Handler
+async def global_error_handler(update, context):
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+
+
 TOKEN = os.getenv("BOT_TOKEN")
 
 def get_admins():
@@ -3140,5 +3169,6 @@ app.add_handler(CommandHandler("demote", demote))
 app.add_handler(CommandHandler("feedback", feedback))
 
 print("Bot is running...")
+app.add_error_handler(global_error_handler)
 app.run_polling()   
 
