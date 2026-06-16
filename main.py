@@ -255,8 +255,6 @@ async def cbroadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=msg
             )
 
-            success += 1
-
      except Exception as e:
             print(e)
      await update.message.reply_text(
@@ -283,8 +281,6 @@ async def gbroadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id= grpid ,
                 text=msg
             )
-
-            success += 1
 
      except Exception as e:
             print(e)
