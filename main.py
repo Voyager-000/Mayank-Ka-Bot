@@ -289,21 +289,21 @@ async def gbroadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
      )
 
 # ========= basic commands ==========
-async def hi(update: Update , context:ContextTypes.DEAFAULT_TYPE):
+async def hi(update: Update , context:ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("namaste bro")
 
-async def bye(update: Update , context:ContextTypes.DEAFAULT_TYPE):
+async def bye(update: Update , context:ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("bye bro....")
 
-async def luck(update: Update , context:ContextTypes.DEAFAULT_TYPE):
+async def luck(update: Update , context:ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(f"your luck is {random.randint(1,101)}%")
 
 #calculator
 
-async def sum(update: Update , context:ContextTypes.DEAFAULT_TYPE):
+async def sum(update: Update , context:ContextTypes.DEFAULT_TYPE):
 
     a = int(context.args[0])
     b = int(context.args[1])
