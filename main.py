@@ -9,9 +9,44 @@ from telegram.ext import CallbackQueryHandler
 from telegram import ChatPermissions
 from telegram.ext import MessageHandler, filters
 
-
-
 TOKEN = os.getenv("BOT_TOKEN")
+
+def get_admins():
+    admin_str = os.getenv("ADMIN_IDS", "")
+    if admin_str:
+        return [int(x.strip()) for x in admin_str.split(",") if x.strip().isdigit()]
+    return []  # Default to empty list if not set
+
+
+
+
+
+async def log_user_and_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.effective_user:
+        return
+    
+    userid = update.effective_user.id
+    try:
+        with open("data_all.txt", "r") as f:
+            c = f.read()
+        if str(userid) not in c:
+            with open("data_all.txt", "a") as f:
+                f.write(f"{userid}\n")
+    except FileNotFoundError:
+        with open("data_all.txt", "w") as f:
+            f.write(f"{userid}\n")
+
+    if update.effective_chat:
+        chatid = update.effective_chat.id
+        try:
+            with open("datachat.txt", "r") as f:
+                c2 = f.read()
+            if str(chatid) not in c2:
+                with open("datachat.txt", "a") as f:
+                    f.write(f"{chatid}\n")
+        except FileNotFoundError:
+            with open("datachat.txt", "w") as f:
+                f.write(f"{chatid}\n")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
@@ -24,24 +59,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(f"hello {name} bhai!!\n use /menu to know what this bot can do..")
 
-
 # =========== main buttons =====================
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    user_id = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(user_id) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{user_id}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     keyboard = [
         [InlineKeyboardButton("⚙ Group manage",callback_data="manage")],
@@ -63,21 +82,6 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def game(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     keyboard2 = [
         [InlineKeyboardButton("rock🪨 , paper 🗒 , scissor✂", callback_data="rps")],
@@ -204,12 +208,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/fuck <name> (or reply to a user)"
          )
 
-
 # ============= broadcast ===========================
 
 async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    ADMIN_ID = 8518689952
-    if update.effective_user.id != ADMIN_ID:
+    admins = get_admins()
+    if update.effective_user.id not in admins and admins:
         await update.message.reply_text("Access Denied ❌\n u r not admin")
         return
 
@@ -241,11 +244,11 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #============ chota broadcast =====================
 
 async def cbroadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-     userid = 8654125707
+     userid = get_admins()[0] if get_admins() else update.effective_user.id
      msg = " ".join(context.args)
 
      try:
-            userid = 8654125707
+            userid = get_admins()[0] if get_admins() else update.effective_user.id
 
             await context.bot.send_message(
                 chat_id= userid ,
@@ -289,84 +292,22 @@ async def gbroadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Broadcast Complete ✅\nSent to this grp."
      )
 
-
 # ========= basic commands ==========
 async def hi(update: Update , context:ContextTypes.DEAFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     await update.message.reply_text("namaste bro")
 
 async def bye(update: Update , context:ContextTypes.DEAFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     await update.message.reply_text("bye bro....")
 
 async def luck(update: Update , context:ContextTypes.DEAFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     await update.message.reply_text(f"your luck is {random.randint(1,101)}%")
-
 
 #calculator
 
 async def sum(update: Update , context:ContextTypes.DEAFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     a = int(context.args[0])
     b = int(context.args[1])
@@ -375,42 +316,12 @@ async def sum(update: Update , context:ContextTypes.DEAFAULT_TYPE):
 
 async def mul(update, context):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     a = int(context.args[0])
     b = int(context.args[1])
 
     await update.message.reply_text(f"{a} x {b} = {a*b}")
 
 async def div(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     a = int(context.args[0])
     b = int(context.args[1])
@@ -419,46 +330,14 @@ async def div(update, context):
 
 async def sub(update, context):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     a = int(context.args[0])
     b = int(context.args[1])
 
     await update.message.reply_text(f"{a} - {b} = {a-b}")
 
-
 # calculator all in one
 
 async def cal(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     a = int(context.args[0])
     op = context.args[1]
@@ -485,29 +364,9 @@ async def cal(update, context):
 
     await update.message.reply_text(str(result))
 
-
-
-
-
 # dice roll
 
 async def roll(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     num = random.randint(1, 6)
 
@@ -517,49 +376,15 @@ async def roll(update, context):
 
 async def toss(update, context):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     coin = ["🪙 heads","🪙 tails"]
-    
 
     resul = random.choice(coin)
 
     await update.message.reply_text(f" {resul}")
 
-
-
 # prime number check
 
-
 async def prime(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     a = int(context.args[0])
 
@@ -568,31 +393,13 @@ async def prime(update, context):
         if(a%i == 0):
             await update.message.reply_text("number is not prime")
             break
-            i = i + 1
-        
 
     else:
         await update.message.reply_text("number is prime") 
-        
-            
+
 # ========== truth dare ===========
 
 async def truth(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     truths = [
     "Who in this group would you date if you had no other option?",
@@ -1082,22 +889,6 @@ async def truth(update, context):
 
 async def dare(update, context):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
-
     dares = [
     "Change your Telegram name for 10 minutes.",
     "Send your last selfie in the group.",
@@ -1258,7 +1049,6 @@ async def dare(update, context):
 
 # gaali laddder 
 
-
 async def spam(update, context,a):
     gaali_list = [
         "Ch*tiya",
@@ -1350,44 +1140,12 @@ async def spam(update, context,a):
     await update.message.reply_text(f"aaj k liye bas itna hi \n aapki tarah mai bhi mayus hu \n ||aage ka khud complete kr le||")
 async def surprise(update,context):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
-
     a = context.args[0]
     asyncio.create_task(spam(update,context,a))
     await update.message.reply_text("ok saaarr")
     
 # ============ pickup line =============
 async def flirt(update, context):
-
-    user_id = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(user_id) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{user_id}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     pickup_lines = [
         "kya tum Wi-Fi ho? Kyuki tumse connect hote hi sab smooth lagta hai.",
@@ -1517,7 +1275,6 @@ async def flirt(update, context):
 
         await update.message.reply_text(f" {user.first_name} {b}")
 
-
     elif len(context.args)>0:
         a = context.args[0]
         await update.message.reply_text(f"{a}c {b}")
@@ -1527,25 +1284,9 @@ async def flirt(update, context):
             "reply to a useru"
         )
 
-
 #tables 
 
 async def table(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     kela = context.args[0]
     n = int(kela)
@@ -1553,28 +1294,9 @@ async def table(update, context):
         await update.message.reply_text(f"{n} x {i} = {n*i}")
     i += 1
 
-
-
-
 #rock paper scissors
 
-
 async def rps(update, context):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     you = context.args[0]
     c = random.choice([1,-1,0])
@@ -1589,61 +1311,34 @@ async def rps(update, context):
     
         elif(younum==1 and c==0):
                     await update.message.reply_text(f" you lost ❌  \n your choice {revdic[younum]} 🪨 , computers choice {revdic[c]} 🗒")
-    
-                        
+
         elif(younum==1 and c==-1):
                     await update.message.reply_text(f" you won .✅. \n your choice {revdic[younum]} 🪨 , computers choice {revdic[c]}✂")
-
 
         elif(younum==0 and c==0): 
                     await update.message.reply_text(f" draw 🟰 \n your choice {revdic[younum]} 🗒 , computers choice {revdic[c]} 🗒")
 
-                    
         elif(younum==0 and c==-1):
                     await update.message.reply_text(f" you lost ❌  \n your choice {revdic[younum]} 🗒 , computers choice {revdic[c]}✂")
-
 
         elif(younum==0 and c==1):
                     await update.message.reply_text(f" you won .✅. \n your choice {revdic[younum]} 🗒 , computers choice {revdic[c]} 🪨") 
 
-
         elif(younum==-1 and c==-1):
                     await update.message.reply_text(f" draw 🟰 \n your choice {revdic[younum]}✂ , computers choice {revdic[c]}")
 
-                    
         elif(younum==-1 and c==1):
                     await update.message.reply_text(f" you lost ❌  \n your choice {revdic[younum]} ✂, computers choice {revdic[c]} 🪨 ") 
 
-                    
         elif(younum==-1 and c==0):
                     await update.message.reply_text(f" you won .✅. \n your choice {revdic[younum]}✂ , computers choice {revdic[c]} 🗒")
 
-
         else:
                 await update.message.reply_text("kuch to gdbd h daya")
-                        
-
-
 
 # ================number guessing game ================
 games = {}
 async def numguess(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     user_id = update.effective_user.id
 
@@ -1710,16 +1405,12 @@ async def save(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text("aapka sman save ho gaya h .., \n kripya /mynotes se dekhe kya kya save h ")
 
-
 async def mynotes(update: Update, context: ContextTypes.DEFAULT_TYPE):
     userid = update.effective_user.id
     with open(f"notesDATA/data_{userid}","r") as f:
          content = f.read()
     await update.message.reply_text(content)
     await update.message.reply_text(" / delete will delete ur all notes")
-
-
-
 
 async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     userid = update.effective_user.id
@@ -1729,45 +1420,13 @@ async def delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ==== fun ===============
 
-
 async def nude(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     await update.message.reply_text("⠄⠄⠄⣀⣠⣤⣤⣤⣄⡀⠄⠄⠄⠄⠄ ⠄⠄⠄⠄⠄⠄⣴⣿⣿⣿⡿⣿⡿⣗⢌⢳⡀⠄⠄⠄ ⠄⠄⠄⠄⠄⣼⣿⡇⣿⠹⡸⡹⣷⡹⡎⣧⢳⠄⠄⠄ ⠄⠄⠄⠄⠄⣿⣿⠱⡙⠰⣢⡱⢹⡇⡷⢸⢸⠄⠄⠄ ⠄⠄⠄⠄⠄⢿⢸⡈⣉⣤⠠⣴⡄⡇⠁⠄⢸⠄⠄⠄ ⠄⠄⠄⠄⠄⠸⡆⡃⡙⢍⣹⡿⢓⠄⠤⣐⡟⠄⠄⠄ ⠄⠄⠄⠄⠄⠄⠙⠾⠾⠮⣵⢸⡔⢷⣍⠉⠄⠄⠄⠄ ⠄⠄⠄⠄⢀⣴⣾⣿⣷⡺⡋⢞⣎⣚⣛⣳⣴⣶⣤⡀ ⠄⠄⠄⠄⢘⣛⣩⣾⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⣿⣷ ⠄⠄⣀⠺⣿⣿⣿⠟⣡⣾⠿⢿⣿⣿⡎⢋⠻⣿⣿⣿ ⠄⠄⣉⣠⣿⣿⡏⣼⣿⠁⠶⠄⣿⣿⡇⡼⠄⠈⠛⢿ ⠄⠄⣈⠻⠿⠟⢁⠘⢿⣷⣶⣾⣿⠟⡰⠃⠄⠄⠄⠄ ⠄⣴⣿⣧⢻⣿⣿⣷⣦⣬⣉⣩⣴⠞⠁⠄⠄⠄⠄⠄ ⠄⠘⠿⠿⢸⣿⣿⣿⣿⣿⣿⣿⠁⠄⠄⠄⠄⠄⠄⠄ ⠄⢤⡝⣧⢸⣿⣿⣿⣿⣿⣿⠟⠄⠄⠄⠄⠄⠄⠄⠄ ⣜⢧⠻⣀⢿⣿⣿⣿⣿⣿⠏⣾⣧⡀⠄⠄⠄⠄⠄⠄ ⠹⢂⣾⣿⠸⣿⣿⣿⣿⡏⣼⣿⣿⣷⠄⠄⠄⠄⠄⠄ ⠄⣿⣿⣿⣧⠹⣿⢻⡿⢰⣿⣿⣿⣿⣇⠄⠄⠄⠄⠄ ⢸⣿⣿⣿⣿⣇⢹⢸⢁⣿⣿⣿⣿⣿⣿⡆⠄⠄⠄⠄ ⢸⣿⣿⣿⣿⣿⣆⠄⣿⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄ ⠸⣿⣿⣿⣿⣿⣿⠄⢿⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄ ⠄⣿⣿⣿⣿⣿⣿⠄⠈⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄ ⠄⢹⣿⣿⣿⣿⡟⠄⠄⠹⣿⣿⣿⣿⣿⡇")
-
 
 # =========say =======================
 
 async def say100(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     mess = " ".join(context.args)
     i = 1
@@ -1775,23 +1434,7 @@ async def say100(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(mess)
         i = i = 1
 
-
 async def say(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        conten = f.read()
-    if str(userid) not in conten:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        content = f.read()
-    if str(chatid) not in content:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     mess = " ".join(context.args)
 
@@ -1800,21 +1443,6 @@ async def say(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ============= fuck ================
 
 async def fuck(update, context):
-
-    user_id = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(user_id) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{user_id}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
     
     things = [
         "a spoon",
@@ -1918,14 +1546,12 @@ async def fuck(update, context):
         "a cricket ball through the window",
         "a chair missing one leg"
 ]
-    
 
     b = random.choice(things)
     if update.message.reply_to_message:
         user = update.message.reply_to_message.from_user
 
         await update.message.reply_text(f" {user.first_name} got f*cked by {b}")
-
 
     elif len(context.args)>0:
         a = context.args[0]
@@ -1938,20 +1564,6 @@ async def fuck(update, context):
 
 # ==============roast -==================
 async def roast(update, context):
-    user_id = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(user_id) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{user_id}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
     roasts = [
         "itna slow hai ki loading screen bhi isse aage nikal jati hai.",
         "iske dimaag ka password shayad ye khud bhi bhool chuka hai.",
@@ -2102,14 +1714,12 @@ async def roast(update, context):
         "iska future dekhke crystal ball crack ho jaye.",
         "itna slow hai ki turtle bhi isko noob bole.",
 ]
-    
 
     b = random.choice(roasts)
     if update.message.reply_to_message:
         user = update.message.reply_to_message.from_user
 
         await update.message.reply_text(f" {user.first_name} {b}")
-
 
     elif len(context.args)>0:
         a = context.args[0]
@@ -2122,21 +1732,6 @@ async def roast(update, context):
 
 # ============= arrest =================
 async def arrest(update, context):
-
-    user_id = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(user_id) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{user_id}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        contentchat = f.read()
-    if str(chatid) not in contentchat:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     reasons = [
     "had se zyada bakchodi karne ke liye",
@@ -2229,7 +1824,6 @@ async def arrest(update, context):
 
         await update.message.reply_text(f" {user.first_name} is arrested👮‍♂ by bharose wala bot\n🫣reason : {b}")
 
-
     elif len(context.args)>0:
         a = context.args[0]
         await update.message.reply_text(f"{a} is arrested👮‍♂ by bharose wala bot\n🫣reason: {b}")
@@ -2239,13 +1833,9 @@ async def arrest(update, context):
             "reply to a user otherwise i will arrest u"
         )
 
-
-
 # =================rose=================\
 
-
 #### admin check new====
-
 
 async def is_admin(update, context):
      user = await context.bot.get_chat_member( update.effective_chat.id, update.effective_user.id )
@@ -2273,26 +1863,9 @@ async def admin_only(update, context):
 
     return True
 
-
-
 # ================= ID =================
 
 async def id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     if update.message.reply_to_message:
         user = update.message.reply_to_message.from_user
@@ -2307,26 +1880,9 @@ async def id(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"💬 Chat ID: {update.effective_chat.id}"
         )
 
-
 # ================= INFO =================
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     if not update.message.reply_to_message:
         await update.message.reply_text(
@@ -2348,27 +1904,9 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"⭐ Status: {member.status}"
     )
 
-
-
-
 # ================= BAN =================
 
 async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
     
     # Non-admin check
     if not await admin_only(update, context):
@@ -2438,14 +1976,12 @@ async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         return
 
-
         # Can't ban bot
     if target.id == context.bot.id:
             await update.message.reply_text(
                 "🤡 Apne baap ko hi uda dega kya?"
             )
             return
-
 
     # Check target permissions
     target_member = await context.bot.get_chat_member(
@@ -2465,7 +2001,6 @@ async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-
         # Ban user
     await context.bot.ban_chat_member(
             update.effective_chat.id,
@@ -2478,22 +2013,6 @@ async def ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================= UNBAN =================
 
 async def unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     # Non-admin check
     if not await admin_only(update, context):
@@ -2563,22 +2082,6 @@ async def unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def bam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
-
     if not await admin_only(update, context):
         return
 
@@ -2594,26 +2097,9 @@ async def bam(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🔨 Bammed succesfully : {target.full_name}\n\n aur ye /bam wali bkcd mat kar lala"
     )
 
-
 #  =============== KICK =================
 
 async def kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     # Non-admin check
     if not await admin_only(update, context):
@@ -2702,23 +2188,6 @@ async def kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
-
-
     # Non-admin check
     if not await admin_only(update, context):
         return
@@ -2800,26 +2269,9 @@ async def mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🔇 Muted: {target.full_name}"
     )
 
-
 # ================= UNMUTE =================
 
 async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     # Non-admin check
     if not await admin_only(update, context):
@@ -2916,21 +2368,6 @@ async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def promotesecret(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
     if not update.message.reply_to_message:
         await update.message.reply_text(
             "Reply to a user."
@@ -2958,21 +2395,6 @@ async def promotesecret(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #============= promote ===================
 
 async def promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
         # Non-admin check
     if not await admin_only(update, context):
@@ -3065,21 +2487,6 @@ async def promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def sastapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        content = f.read()
-    if str(userid) not in content:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        conten = f.read()
-    if str(chatid) not in conten:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
         # Non-admin check
     if not await admin_only(update, context):
         return
@@ -3161,27 +2568,9 @@ async def sastapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"⭐ Promoted: {target.full_name} with less power"
     )
 
-
-
 # ================= DEMOTE =================
 
 async def demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        conten = f.read()
-    if str(userid) not in conten:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        content = f.read()
-    if str(chatid) not in content:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     # Non-admin check
     if not await admin_only(update, context):
@@ -3275,20 +2664,6 @@ async def demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================= del ==============
 
 async def Del(update,context):
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        conten = f.read()
-    if str(userid) not in conten:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        content = f.read()
-    if str(chatid) not in content:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     if not await admin_only(update, context):
         return
@@ -3332,21 +2707,6 @@ async def Del(update,context):
 
 #=================== purge ======================
 async def purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        conten = f.read()
-    if str(userid) not in conten:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        content = f.read()
-    if str(chatid) not in content:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
 
     if not await admin_only(update, context):
         return
@@ -3409,21 +2769,6 @@ async def purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== pin  =============================================
 
 async def pin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        conten = f.read()
-    if str(userid) not in conten:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        content = f.read()
-    if str(chatid) not in content:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     if not await admin_only(update, context):
         return
@@ -3486,21 +2831,6 @@ async def pin(update: Update, context: ContextTypes.DEFAULT_TYPE):
 LOCKS = {}
 
 async def lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    userid = update.effective_user.id
-    with open("data_all.txt","r") as f:
-        conten = f.read()
-    if str(userid) not in conten:
-        with open("data_all.txt","a") as f:
-            f.write(f"{userid}\n")
-
-
-    chatid = update.effective_chat.id
-    with open("datachat.txt","r") as f:
-        content = f.read()
-    if str(chatid) not in content:
-        with open("datachat.txt","a") as f:
-            f.write(f"{chatid}\n")
-
 
     if not await admin_only(update, context):
         return
@@ -3534,7 +2864,6 @@ async def lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"🔒 Locked: {lock_type}"
     )
-
 
 # = ==============unlock ==================
 
@@ -3584,7 +2913,6 @@ async def lock_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     settings = LOCKS[chat_id]
 
-
     # Sticker Lock
     if settings.get("stickers"):
         if update.message.sticker:
@@ -3615,7 +2943,6 @@ async def lock_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.delete()
             except:
                 pass
-
 
 # ============== set welcome ,,,, set goodbye =======================
 
@@ -3652,7 +2979,6 @@ async def setwelcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ Welcome message saved."
     )
 
-
 async def welcome_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not update.message.new_chat_members:
@@ -3681,9 +3007,6 @@ async def welcome_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
             )
 
-
-
-
 async def setgoodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not await admin_only(update, context):
@@ -3711,8 +3034,6 @@ async def goodbye_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     member = update.message.left_chat_member
 
-
-
         # Custom welcome set hai
     if chat_id in GOODBYE:
             try:
@@ -3734,7 +3055,6 @@ async def goodbye_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ==================feedback ========================
 
-
 async def feedback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     a = " ".join(context.args)
     userid = update.effective_user.id
@@ -3743,9 +3063,9 @@ async def feedback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f.write(f"{name}|{userid} |---  {a}\n")
     await update.message.reply_text("feedback sent to admin ;)")
 
-
-
 app = Application.builder().token(TOKEN).build()
+
+app.add_handler(MessageHandler(filters.ALL, log_user_and_chat), group=-1)
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("hi", hi))
@@ -3787,14 +3107,12 @@ app.add_handler(CommandHandler("dare",dare))
 
 app.add_handler(CallbackQueryHandler(button))
 
-
 app.add_handler(CommandHandler("id", id))
 app.add_handler(CommandHandler("info", info))
 
 app.add_handler(CommandHandler("lock", lock))
 app.add_handler(CommandHandler("unlock", unlock))
 app.add_handler(MessageHandler(filters.ALL, lock_filter), group=999)
-
 
 app.add_handler(CommandHandler("setwelcome", setwelcome))
 app.add_handler(CommandHandler("setgoodbye", setgoodbye))
@@ -3812,7 +3130,6 @@ app.add_handler(
         goodbye_member
     )
 )
-
 
 app.add_handler(CommandHandler("ban", ban))
 app.add_handler(CommandHandler("bam", bam))
@@ -3833,9 +3150,7 @@ app.add_handler(CommandHandler("sastapromote", sastapromote))
 app.add_handler(CommandHandler("promotesecret", promotesecret))
 app.add_handler(CommandHandler("demote", demote))
 
-
 app.add_handler(CommandHandler("feedback", feedback))
-
 
 print("Bot is running...")
 app.run_polling()   
