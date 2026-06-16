@@ -1841,16 +1841,7 @@ async def admin_only(update, context):
 
     user_id = update.effective_user.id
 
-    # Specific user block
-    BLOCKED_USERS = [8603238069]
-    if user_id in BLOCKED_USERS:
-        await update.message.reply_text(
-            "😔 Sorry Moh,\n\n"
-            "Aap is command ko use nahi kar sakte.\n"
-            "Ye suvidha aapke liye uplabdh nahi hai. 🙏\n" \
-            "kyuki hamneaapse bada madarshot insaan nhi dekha "
-        )
-        return False
+
 
     # Admin check
     if not await is_admin(update, context):
